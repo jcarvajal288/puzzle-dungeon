@@ -11,7 +11,7 @@ fn main() {
         .insert_resource(Images::default())
         .insert_resource(LevelMap::default())
         .add_systems(Startup, (load_images, setup, draw).chain())
-        .add_systems(Update, draw)
+        //.add_systems(Update, draw)
         .run();
 }
 
