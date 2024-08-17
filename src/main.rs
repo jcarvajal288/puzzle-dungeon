@@ -20,6 +20,7 @@ fn setup(mut commands: Commands, mut clear_color: ResMut<ClearColor>) {
     clear_color.0 = Color::hsl(211., 1., 0.8);
 }
 
-fn draw(commands: Commands, level_map: Res<LevelMap>, images: Res<Images>) {
-    level_map.draw(commands, &images);
+fn draw(commands: Commands, level_map: Res<LevelMap>, images: Res<Images>, windows: Query<&Window>) {
+    let window_center = Vec2::new(windows.single().resolution.width() / 2., windows.single().resolution.height() / 2.);
+    level_map.draw(commands, &images, window_center);
 }
