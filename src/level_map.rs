@@ -1,6 +1,8 @@
 use bevy::asset::Handle;
+use bevy::asset::ron::de::Position;
 use bevy::prelude::{Commands, Image, Res, Resource, Transform, Vec2};
 use bevy::sprite::SpriteBundle;
+use bevy::ui::ZIndex;
 use bevy::utils::default;
 use crate::images::Images;
 
@@ -31,22 +33,30 @@ impl Default for LevelMap {
 
 impl LevelMap {
     pub fn draw(&self, mut commands: Commands, images: &Res<Images>, window_center: Vec2) {
-        let level_tiles = read_level_tiles(level1::MAP_DATA);
         for y in 0..MAP_HEIGHT {
             for x in 0..MAP_WIDTH {
                 commands.spawn(SpriteBundle {
-                    //texture: images.wall.clone(),
-                    texture: get_image_for_tile(level_tiles.get(y).unwrap().get(x).unwrap(), images),
-                    transform: Transform::from_xyz(
-                        (x as f32 * TILE_SIZE) - window_center.x,
-                        -(y as f32 * TILE_SIZE) + window_center.y,
-                        0.0
-                    ),
+                    texture: get_image_for_tile(self.grid.get(y).unwrap().get(x).unwrap(), images),
+                    transform: transform_from_position(&Position { line: y, col: x }, window_center, 0.0),
                     ..default()
                 });
             }
         }
     }
+}
+
+pub fn load_level_1() -> LevelMap {
+    return LevelMap {
+        grid: read_level_tiles(level1::MAP_DATA),
+    }
+}
+
+pub fn transform_from_position(position: &Position, window_center: Vec2, zindex: f32) -> Transform {
+    return Transform::from_xyz(
+        (position.col as f32 * TILE_SIZE) - window_center.x,
+        -(position.line as f32 * TILE_SIZE) + window_center.y,
+        zindex
+    )
 }
 
 fn get_image_for_tile(tile: &Tile, images: &Res<Images>) -> Handle<Image> {
@@ -62,7 +72,7 @@ fn read_level_tiles(map_data: &str) -> Vec<Vec<Tile>> {
             return match character {
                 '#' => Tile::WALL,
                 '.' => Tile::FLOOR,
-                _ => Tile::WALL
+                _   => Tile::FLOOR,
             }
         }).collect()
     }).collect();
