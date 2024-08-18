@@ -2,15 +2,15 @@ use bevy::asset::Handle;
 use bevy::asset::ron::de::Position;
 use bevy::prelude::{Commands, Image, Res, Resource, Transform, Vec2};
 use bevy::sprite::SpriteBundle;
-use bevy::ui::ZIndex;
 use bevy::utils::default;
+
 use crate::images::Images;
 
 #[path = "levels/level1.rs"] mod level1;
 
 const MAP_WIDTH: usize = 23;
 const MAP_HEIGHT: usize = 23;
-const TILE_SIZE: f32 = 32.0;
+pub const TILE_SIZE: f32 = 32.0;
 
 #[derive(Clone)]
 pub enum Tile {

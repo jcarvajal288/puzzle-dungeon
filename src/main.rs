@@ -1,13 +1,13 @@
+use bevy::prelude::*;
+
+use crate::images::{Images, load_images};
+use crate::level_map::LevelMap;
+use crate::player::Player;
+
 mod images;
 mod level_map;
 mod player;
 #[path = "levels/level1.rs"] mod level1;
-
-use bevy::asset::ron::de::Position;
-use bevy::prelude::*;
-use crate::images::{Images, load_images};
-use crate::level_map::LevelMap;
-use crate::player::Player;
 
 fn main() {
     App::new()
@@ -15,7 +15,7 @@ fn main() {
         .insert_resource(Images::default())
         .insert_resource(level_map::load_level_1())
         .add_systems(Startup, (load_images, setup).chain())
-        //.add_systems(Update, draw)
+        .add_systems(Update, player_movement_system)
         .run();
 }
 
@@ -37,5 +37,19 @@ fn setup(mut commands: Commands, level_map: Res<LevelMap>, images: Res<Images>, 
     ));
 
     level_map.draw(commands, &images, window_center);
+}
+
+fn player_movement_system(keyboard_input: Res<ButtonInput<KeyCode>>, mut player_query: Query<(&Player, &mut Transform)>) {
+    let (player, mut transform) = player_query.single_mut();
+
+    if keyboard_input.just_pressed(KeyCode::ArrowLeft) {
+        transform.translation.x -= level_map::TILE_SIZE;
+    } else if keyboard_input.just_pressed(KeyCode::ArrowRight) {
+        transform.translation.x += level_map::TILE_SIZE;
+    } else if keyboard_input.just_pressed(KeyCode::ArrowUp) {
+        transform.translation.y += level_map::TILE_SIZE;
+    } else if keyboard_input.just_pressed(KeyCode::ArrowDown) {
+        transform.translation.y -= level_map::TILE_SIZE;
+    }
 }
 
