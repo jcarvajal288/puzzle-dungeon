@@ -43,6 +43,13 @@ impl LevelMap {
             }
         }
     }
+
+    pub fn is_position_walkable(&self, position: &Position) -> bool {
+        return match self.grid.get(position.line).unwrap().get(position.col).unwrap() {
+            Tile::FLOOR => true,
+            _ => false
+        }
+    }
 }
 
 pub fn load_level_1() -> LevelMap {

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-
+use bevy::scene::ron::de::Position;
 use crate::images::{Images, load_images};
 use crate::level_map::LevelMap;
 use crate::player::Player;
@@ -39,17 +39,25 @@ fn setup(mut commands: Commands, level_map: Res<LevelMap>, images: Res<Images>, 
     level_map.draw(commands, &images, window_center);
 }
 
-fn player_movement_system(keyboard_input: Res<ButtonInput<KeyCode>>, mut player_query: Query<(&Player, &mut Transform)>) {
-    let (player, mut transform) = player_query.single_mut();
+fn player_movement_system(
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut player_query: Query<(&mut Player, &mut Transform)>,
+    level_map: Res<LevelMap>,
+) {
+    let (mut player, mut transform) = player_query.single_mut();
 
-    if keyboard_input.just_pressed(KeyCode::ArrowLeft) {
+    if keyboard_input.just_pressed(KeyCode::ArrowLeft) && level_map.is_position_walkable(&player.left()) {
         transform.translation.x -= level_map::TILE_SIZE;
-    } else if keyboard_input.just_pressed(KeyCode::ArrowRight) {
+        player.move_left();
+    } else if keyboard_input.just_pressed(KeyCode::ArrowRight) && level_map.is_position_walkable(&player.right()) {
         transform.translation.x += level_map::TILE_SIZE;
-    } else if keyboard_input.just_pressed(KeyCode::ArrowUp) {
+        player.move_right();
+    } else if keyboard_input.just_pressed(KeyCode::ArrowUp) && level_map.is_position_walkable(&player.up()) {
         transform.translation.y += level_map::TILE_SIZE;
-    } else if keyboard_input.just_pressed(KeyCode::ArrowDown) {
+        player.move_up();
+    } else if keyboard_input.just_pressed(KeyCode::ArrowDown) && level_map.is_position_walkable(&player.down()) {
         transform.translation.y -= level_map::TILE_SIZE;
+        player.move_down();
     }
 }
 
